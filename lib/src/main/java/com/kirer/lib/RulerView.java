@@ -190,8 +190,8 @@ public class RulerView extends View {
         mTextPaint.getTextBounds(text, 0, text.length(), mTextRect);
         mSymbolTextPaint.getTextBounds(SYMBOL, 0, SYMBOL.length(), mSymbolRect);
         float centerX = getWidth() / 2;
-        canvas.drawText(text, centerX + mOffset - mTextRect.width() / 2 - mLineWidth / 2, mTextBaseLineY, mTextPaint);
-        canvas.drawText(SYMBOL, centerX + mOffset + mSymbolRect.width() / 2 + mLineWidth / 2, mTextBaseLineY, mSymbolTextPaint);
+        canvas.drawText(text, centerX + mOffset - mTextRect.width() / 2, mTextBaseLineY, mTextPaint);
+        canvas.drawText(SYMBOL, centerX + mOffset + mSymbolRect.width() / 2 + mLineWidth * 2, mTextBaseLineY, mSymbolTextPaint);
         canvas.drawLine(centerX + mOffset, mLineStartY, centerX + mOffset, mLineEndY, mLinePaint);
     }
 
@@ -214,8 +214,8 @@ public class RulerView extends View {
             mTextPaint.getTextBounds(text, 0, text.length(), mTextRect);
             mSymbolTextPaint.getTextBounds(SYMBOL, 0, SYMBOL.length(), mSymbolRect);
             float centerX = getWidth() / 2 - mDistance * (mSelectedValue - i);
-            canvas.drawText(text, centerX + mOffset - mTextRect.width() / 2 - mLineWidth / 2, mTextBaseLineY, mTextPaint);
-            canvas.drawText(SYMBOL, centerX + mOffset + mSymbolRect.width() / 2 + mLineWidth / 2, mTextBaseLineY, mSymbolTextPaint);
+            canvas.drawText(text, centerX + mOffset - mTextRect.width() / 2, mTextBaseLineY, mTextPaint);
+            canvas.drawText(SYMBOL, centerX + mOffset + mSymbolRect.width() / 2 + mLineWidth * 2, mTextBaseLineY, mSymbolTextPaint);
             canvas.drawLine(centerX + mOffset, mLineStartY, centerX + mOffset, mLineEndY, mLinePaint);
         }
         mLinePaint.setStrokeWidth(2 * mLineWidth);
@@ -241,8 +241,8 @@ public class RulerView extends View {
             mTextPaint.getTextBounds(text, 0, text.length(), mTextRect);
             mSymbolTextPaint.getTextBounds(SYMBOL, 0, SYMBOL.length(), mSymbolRect);
             float centerX = getWidth() / 2 - mDistance * (mSelectedValue - i);
-            canvas.drawText(text, centerX + mOffset - mTextRect.width() / 2 - mLineWidth / 2, mTextBaseLineY, mTextPaint);
-            canvas.drawText(SYMBOL, centerX + mOffset + mSymbolRect.width() / 2 + mLineWidth / 2, mTextBaseLineY, mSymbolTextPaint);
+            canvas.drawText(text, centerX + mOffset - mTextRect.width() / 2, mTextBaseLineY, mTextPaint);
+            canvas.drawText(SYMBOL, centerX + mOffset + mSymbolRect.width() / 2 + mLineWidth * 2, mTextBaseLineY, mSymbolTextPaint);
             canvas.drawLine(centerX + mOffset, mLineStartY, centerX + mOffset, mLineEndY, mLinePaint);
         }
         mLinePaint.setStrokeWidth(2 * mLineWidth);
