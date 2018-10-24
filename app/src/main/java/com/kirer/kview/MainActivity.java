@@ -85,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
         rulerView.setLineWidth(5);
         rulerView.setLineHeight(50);
         rulerView.setTextAndLineSpacing(30);
+        rulerView.setFlingDamping(10);
+        rulerView.setSymbolTextSizeRatio(0.8f);
         rulerView.setOnRulerListener(new GradientRulerView.OnRulerListener() {
             @Override
             public void onSelected(float value) {

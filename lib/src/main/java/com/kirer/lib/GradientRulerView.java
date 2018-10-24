@@ -28,6 +28,8 @@ public class GradientRulerView extends View {
 
     private static final String TAG = "GradientRulerView";
     private static final String SYMBOL = "%";
+    private static final float DEFAULT_FLING_DAMPING = 10f;
+    private static final float DEFAULT_SYMBOL_TEXT_SIZE_RATIO = 0.8f;
     private Paint mLinePaint;
     private Paint mBottomLinePaint;
     private TextPaint mTextPaint;
@@ -45,6 +47,7 @@ public class GradientRulerView extends View {
     private float mSelectedTextSize = 100;
     private float mTextSize = 50;
     private float mTextBaseLineY;
+    private float mSymbolTextSizeRatio = DEFAULT_SYMBOL_TEXT_SIZE_RATIO;
 
     private int mCenterX;
     private float mTextAndLineSpacing = 20;
@@ -64,6 +67,7 @@ public class GradientRulerView extends View {
     private float mChanging;
     private int mScaler = 0;
     private boolean mFling;
+    private float mFlingDamping = DEFAULT_FLING_DAMPING;
     private boolean isCancelFling = false;
 
     private ObjectAnimator mAdjustPositionAnimator;
@@ -133,10 +137,10 @@ public class GradientRulerView extends View {
 
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                if (Math.abs(velocityX) < mSpacing) {
+                if (Math.abs(velocityX / mFlingDamping) < mSpacing) {
                     return false;
                 }
-                mChanging = velocityX;
+                mChanging = velocityX / mFlingDamping;
                 if (mChanging > 0) {
                     mChanging = mChanging > (mSelectedValue - mMinValue) * mSpacing ? (mSelectedValue - mMinValue) * mSpacing : mChanging;
                 } else if (mChanging < 0) {
@@ -202,7 +206,7 @@ public class GradientRulerView extends View {
             mTextPaint.getTextBounds(text, 0, text.length(), mTextRect);
             canvas.drawText(text, x - mTextRect.width() / 2 - mLinePaint.getStrokeWidth() / 2, mTextBaseLineY, mTextPaint);
 
-            mSymbolTextPaint.setTextSize(mTextPaint.getTextSize() * 0.8f);
+            mSymbolTextPaint.setTextSize(mTextPaint.getTextSize() * mSymbolTextSizeRatio);
             mSymbolTextPaint.getTextBounds(SYMBOL, 0, SYMBOL.length(), mSymbolRect);
             canvas.drawText(SYMBOL, x + mSymbolRect.width() / 2 + mLinePaint.getStrokeWidth() / 2, mTextBaseLineY, mSymbolTextPaint);
 
@@ -372,6 +376,11 @@ public class GradientRulerView extends View {
         postInvalidate();
     }
 
+    public void setSymbolTextSizeRatio(float ratio) {
+        this.mSymbolTextSizeRatio = ratio;
+        postInvalidate();
+    }
+
     public void setTextAndLineSpacing(float textAndLineSpacing) {
         this.mTextAndLineSpacing = textAndLineSpacing;
         requestLayout();
@@ -380,6 +389,10 @@ public class GradientRulerView extends View {
     public void setSpacing(float spacing) {
         this.mSpacing = spacing;
         postInvalidate();
+    }
+
+    public void setFlingDamping(float flingDamping){
+        this.mFlingDamping = flingDamping;
     }
 
     private OnRulerListener mListener;
