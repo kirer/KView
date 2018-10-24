@@ -18,10 +18,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.kirer.lib.RulerView
+    <com.kirer.lib.GradientRulerView
         android:id="@+id/ruler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#e7e7e7"
         android:layout_marginTop="16dp"/>
 
 

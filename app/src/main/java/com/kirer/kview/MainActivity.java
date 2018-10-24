@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.kirer.lib.ClearAction;
 import com.kirer.lib.EyeAction;
 import com.kirer.lib.KEditText;
-import com.kirer.lib.RulerView;
+import com.kirer.lib.GradientRulerView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -74,8 +74,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        RulerView rulerView = findViewById(R.id.ruler_view);
-        rulerView.setOnRulerListener(new RulerView.OnRulerListener() {
+        GradientRulerView rulerView = findViewById(R.id.ruler_view);
+        rulerView.setMinValue(2);
+        rulerView.setMaxValue(25);
+        rulerView.setSelectedValue(5);
+        rulerView.setSelectedTextSize(100);
+        rulerView.setTextSize(50);
+        rulerView.setBottomLineWidth(10);
+        rulerView.setSpacing(200);
+        rulerView.setLineWidth(5);
+        rulerView.setLineHeight(50);
+        rulerView.setTextAndLineSpacing(30);
+        rulerView.setOnRulerListener(new GradientRulerView.OnRulerListener() {
             @Override
             public void onSelected(float value) {
                 Log.e("MainActivity","onSelected --> " + value);
