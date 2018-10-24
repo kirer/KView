@@ -4,12 +4,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 import android.widget.TextView;
 
 import com.kirer.lib.ClearAction;
 import com.kirer.lib.EyeAction;
 import com.kirer.lib.KEditText;
+import com.kirer.lib.RulerView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -68,6 +70,15 @@ public class MainActivity extends AppCompatActivity {
             public void onPass(KEditText et) {
                 tipTv.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.holo_green_light));
                 tipTv.setText("Phone is ok --> " + et.getText().toString());
+            }
+        });
+
+
+        RulerView rulerView = findViewById(R.id.ruler_view);
+        rulerView.setOnRulerListener(new RulerView.OnRulerListener() {
+            @Override
+            public void onSelected(float value) {
+                Log.e("MainActivity","onSelected --> " + value);
             }
         });
     }

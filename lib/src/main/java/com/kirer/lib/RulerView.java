@@ -13,6 +13,7 @@ import android.graphics.Shader;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,6 +50,7 @@ public class RulerView extends View {
     private int mMaxValue = 45;
     private int mSelectedValue = 12;
     private float mOffset;
+    private float mChanging;
 
     private GestureDetector mGestureDetectorCompat;
     private boolean mFling;
@@ -102,24 +104,25 @@ public class RulerView extends View {
                 if (mSelectedValue == mMaxValue && distanceX > 0) {
                     return false;
                 }
-                setOffset(mOffset - distanceX);
+                mChanging -= distanceX;
+                setOffset(mChanging);
                 return true;
             }
 
 
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                float velocity = velocityX / 15;
-                if (Math.abs(velocity) < mDistance) {
+                mChanging = velocityX;
+                if (Math.abs(mChanging) < mDistance) {
                     return false;
                 }
-                if (velocity > 0) {
-                    velocity = velocity > (mSelectedValue - mMinValue) * mDistance ? (mSelectedValue - mMinValue) * mDistance : velocity;
-                } else if (velocity < 0) {
-                    velocity = Math.abs(velocity) > (mMaxValue - mSelectedValue) * mDistance ? -(mMaxValue - mSelectedValue) * mDistance : velocity;
+                if (mChanging > 0) {
+                    mChanging = mChanging > (mSelectedValue - mMinValue) * mDistance ? (mSelectedValue - mMinValue) * mDistance : mChanging;
+                } else if (mChanging < 0) {
+                    mChanging = Math.abs(mChanging) > (mMaxValue - mSelectedValue) * mDistance ? -(mMaxValue - mSelectedValue) * mDistance : mChanging;
                 }
                 mFling = true;
-                fling(velocity);
+                fling(mChanging);
                 return true;
             }
         });
@@ -251,6 +254,9 @@ public class RulerView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if(mFling && null != flingAnimator){
+            flingAnimator.cancel();
+        }
         boolean resolve = mGestureDetectorCompat.onTouchEvent(event);
         if (!mFling && MotionEvent.ACTION_UP == event.getAction()) {
             adjustPosition();
@@ -259,47 +265,65 @@ public class RulerView extends View {
         return resolve || super.onTouchEvent(event);
     }
 
+    private int index = 0;
+
     private void setOffset(float offset) {
         if (Math.abs(offset) < mDistance) {
             this.mOffset = offset;
-        } else {
-            int index = (int) (Math.abs(offset) / mDistance);
+        } else if (Math.abs(offset) > mDistance) {
+            if (index != (int) (Math.abs(offset) / mDistance)) {
+                index = (int) (Math.abs(offset) / mDistance);
+                if (offset < 0) {
+                    mSelectedValue = mSelectedValue + 1 > mMaxValue ? mMaxValue : mSelectedValue + 1;
+                } else if (offset > 0) {
+                    mSelectedValue = mSelectedValue - 1 < mMinValue ? mMinValue : mSelectedValue - 1;
+                }
+            }
             if (offset < 0) {
-                mSelectedValue = mSelectedValue + index > mMaxValue ? mMaxValue : mSelectedValue + index;
                 this.mOffset = offset + index * mDistance;
             } else if (offset > 0) {
-                mSelectedValue = mSelectedValue - index < mMinValue ? mMinValue : mSelectedValue - index;
                 this.mOffset = offset - index * mDistance;
-            } else {
-                this.mOffset = 0;
             }
+        } else {
+            if (offset < 0) {
+                mSelectedValue = mSelectedValue + 1 > mMaxValue ? mMaxValue : mSelectedValue + 1;
+            } else if (offset > 0) {
+                mSelectedValue = mSelectedValue - 1 < mMinValue ? mMinValue : mSelectedValue - 1;
+            }
+            mOffset = 0;
         }
         postInvalidate();
     }
 
+    private ObjectAnimator adjustPositionAnimator;
     private void adjustPosition() {
-        ObjectAnimator animator;
-        if (Math.abs(mOffset) > mDistance / 2) {
-            animator = ObjectAnimator.ofFloat(this, "offset", mOffset, mOffset > 0 ? mDistance : -mDistance);
-        } else {
-            animator = ObjectAnimator.ofFloat(this, "offset", mOffset, 0);
+        if(null != adjustPositionAnimator && adjustPositionAnimator.isRunning()){
+            adjustPositionAnimator.cancel();
+            return;
         }
-        animator.setDuration(100);
-        animator.addListener(new AnimatorListenerAdapter() {
+        if (Math.abs(mOffset) > mDistance / 2) {
+            adjustPositionAnimator = ObjectAnimator.ofFloat(this, "offset", mOffset, mOffset > 0 ? mDistance : -mDistance);
+        } else {
+            adjustPositionAnimator = ObjectAnimator.ofFloat(this, "offset", mOffset, 0);
+        }
+        adjustPositionAnimator.setDuration(100);
+        adjustPositionAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
+                mChanging = 0;
                 if (null == mListener) {
                     return;
                 }
                 mListener.onSelected(mSelectedValue);
             }
         });
-        animator.start();
+        adjustPositionAnimator.start();
     }
 
+    private ObjectAnimator flingAnimator;
     private void fling(float velocityX) {
-        ObjectAnimator flingAnimator = ObjectAnimator.ofFloat(this, "offset", mOffset, velocityX);
+        flingAnimator = ObjectAnimator.ofFloat(this, "offset", mOffset, velocityX);
         flingAnimator.setDuration((long) Math.abs(velocityX));
         flingAnimator.setInterpolator(new DecelerateInterpolator());
         flingAnimator.addListener(new AnimatorListenerAdapter() {
